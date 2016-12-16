@@ -10,7 +10,8 @@ namespace AdventOfCode2016.Days
     {
         private readonly string[] _input = File.ReadAllLines("Resources/InputDay10.txt");
 
-        private readonly IList<Bot> _bots = new List<Bot>();        
+        private readonly IList<Bot> _bots = new List<Bot>();
+        private readonly Dictionary<int, List<int>> _outputs = new Dictionary<int, List<int>>();
 
         public void Part1()
         {
@@ -45,7 +46,7 @@ namespace AdventOfCode2016.Days
                     if (bot.Microchips.Contains(17) && bot.Microchips.Contains(61))
                     {
                         winnerBot = bot;
-                        break;
+                        //break;
                     }
 
                     Bot highBot = null; 
@@ -69,6 +70,12 @@ namespace AdventOfCode2016.Days
                         }
                         highBot.AddMicrochip(highName);
                     }
+                    else
+                    {
+                        if(!_outputs.ContainsKey(botInstruction.HightName))
+                            _outputs.Add(botInstruction.HightName, new List<int>());
+                        _outputs[botInstruction.HightName].Add(highName);
+                    }
                    
                     int lowName = bot.LowValue();
                     if (botInstruction.LowType.Equals("bot"))
@@ -79,21 +86,28 @@ namespace AdventOfCode2016.Days
                             _bots.Add(lowBot);
                         }
                         lowBot.AddMicrochip(lowName);
-                    }                    
+                    }
+                    else
+                    {
+                        if (!_outputs.ContainsKey(botInstruction.LowName))
+                            _outputs.Add(botInstruction.LowName, new List<int>());
+                        _outputs[botInstruction.LowName].Add(lowName);
+                    }
                     processedInstructions.Add(botInstruction);
                 }
 
                 foreach (var i in processedInstructions)
                     instructions.Remove(i);
-
-                if (winnerBot != null)
-                    break;
             }            
             Console.WriteLine($"Part1: winning bot: {winnerBot?.Name}");     
         }      
 
         public void Part2()
         {
+            var outputs = _outputs.OrderBy(o => o.Key).ToList();
+            int answer = outputs.ElementAt(0).Value.Sum() *outputs.ElementAt(1).Value.Sum()*
+                         outputs.ElementAt(2).Value.Sum();
+            Console.WriteLine($"Part2: {answer}");
         }
 
         private static bool VerifyBots(Bot[] bots)
