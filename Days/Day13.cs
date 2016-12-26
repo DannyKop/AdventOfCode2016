@@ -10,9 +10,6 @@ namespace AdventOfCode2016.Days
         private const int Input = 1350;
         private static readonly Point StartPoint = new Point(1, 1);
         private static Point _endPoint = new Point(31, 39);
-        private readonly HashSet<Point> _visited = new HashSet<Point>();
-        private readonly Queue<Location> _unvisited = new Queue<Location>();
-
 
         public void Part1()
         {                        
@@ -29,8 +26,6 @@ namespace AdventOfCode2016.Days
                 {
                     if (!IsOpenSpace(x, y))
                         continue;
-                    _visited.Clear();
-                    _unvisited.Clear();
                     
                     _endPoint.X = x;
                     _endPoint.Y = y;
@@ -49,16 +44,20 @@ namespace AdventOfCode2016.Days
                 Point = StartPoint,
                 Steps = 0
             };
-            _unvisited.Enqueue(startLocation);
+
+            HashSet<Point> visited = new HashSet<Point>();
+            Queue<Location> unvisited = new Queue<Location>();
+
+            unvisited.Enqueue(startLocation);
 
             int mimimumSteps = int.MaxValue;
-            while (_unvisited.Count > 0)
+            while (unvisited.Count > 0)
             {
-                Location current = _unvisited.Dequeue();
+                Location current = unvisited.Dequeue();
 
-                if (_visited.Contains(current.Point))
+                if (visited.Contains(current.Point))
                     continue;
-                _visited.Add(current.Point);
+                visited.Add(current.Point);
 
                 if (current.Point.Equals(_endPoint))
                 {
@@ -71,7 +70,7 @@ namespace AdventOfCode2016.Days
 
                 ICollection<Location> nextMoves = GetNextLocations(current);
                 foreach (var loc in nextMoves)
-                    _unvisited.Enqueue(loc);
+                    unvisited.Enqueue(loc);
             }
             return mimimumSteps;
         }
